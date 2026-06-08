@@ -2,7 +2,14 @@
 import React, { useMemo } from 'react';
 import { CollectionRecord, AdvancePayment, FertilizerIssue, Farmer, AppSettings } from '../types';
 import { translations } from '../translations';
-import { Printer, Calendar, TrendingUp } from 'lucide-react';
+import { Printer, Calendar, TrendingUp, Download, Users, Sprout, Landmark, Scale } from 'lucide-react';
+import { 
+  exportFarmersToExcel,
+  exportCollectionsToExcel,
+  exportAdvancesToExcel,
+  exportFertilizersToExcel,
+  exportAggregatedSummaryToExcel 
+} from '../lib/exportUtils';
 
 interface Props {
   collections: CollectionRecord[];
@@ -76,6 +83,103 @@ const ReportsView: React.FC<Props> = ({ collections, advances, fertilizers, farm
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <ReportCard title={t.weekly_report} stats={weekly} t={t} icon={<Calendar size={48}/>} accent="emerald" />
         <ReportCard title={t.monthly_report} stats={monthly} t={t} icon={<TrendingUp size={48}/>} accent="slate" />
+      </div>
+
+      {/* Microsoft Excel Data Export Hub */}
+      <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-8 space-y-6 no-print">
+        <div>
+          <h2 className="text-xl font-bold text-slate-800 flex items-center space-x-2">
+            <span className="p-2 bg-emerald-50 text-emerald-700 rounded-xl">
+              <Download size={22} className="text-emerald-600" />
+            </span>
+            <span>Microsoft Excel Export Hub</span>
+          </h2>
+          <p className="text-sm text-slate-500 mt-1">Export your center's tables to download and open natively inside Microsoft Excel. All files are prepended with an official UTF-8 signature to ensure flawless compatibility with names and labels.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pt-2">
+          {/* Main featured Aggregated Sheets */}
+          <div className="md:col-span-12 p-6 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-2xl text-white shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-1">
+              <span className="bg-emerald-700/60 text-xs px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Highly Recommended</span>
+              <h3 className="text-lg font-black mt-1">Export Complete Balance Sheet</h3>
+              <p className="text-xs text-emerald-100 max-w-xl">Generates an consolidated excel spreadsheet matching each farmer with their total leaf intakes (kg), gross earnings, deducted cash advances, issued fertilizers, and final Net Due Payout.</p>
+            </div>
+            <button 
+              onClick={() => exportAggregatedSummaryToExcel(farmers, collections, advances, fertilizers)}
+              className="bg-white text-emerald-700 font-bold px-6 py-3.5 rounded-xl hover:bg-emerald-50 transition-all shadow-md flex items-center justify-center space-x-2 active:scale-95 shrink-0"
+            >
+              <Scale size={18} />
+              <span>Download Balance Sheet</span>
+            </button>
+          </div>
+
+          <div className="md:col-span-12 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <button 
+              onClick={() => exportFarmersToExcel(farmers)}
+              className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/30 rounded-xl transition-all group text-left active:scale-98"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="p-2.5 bg-white border border-slate-200 rounded-lg text-slate-500 group-hover:text-emerald-600 group-hover:border-emerald-200">
+                  <Users size={18} />
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-800 text-sm">Farmers Directory</h4>
+                  <p className="text-[10px] text-slate-400 font-mono">{farmers.length} active growers</p>
+                </div>
+              </div>
+              <Download size={16} className="text-slate-400 group-hover:text-emerald-600" />
+            </button>
+
+            <button 
+              onClick={() => exportCollectionsToExcel(collections)}
+              className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/30 rounded-xl transition-all group text-left active:scale-98"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="p-2.5 bg-white border border-slate-200 rounded-lg text-slate-500 group-hover:text-emerald-600 group-hover:border-emerald-200">
+                  <Scale size={18} />
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-800 text-sm">Leaf Collection Records</h4>
+                  <p className="text-[10px] text-slate-400 font-mono">{collections.length} historical intakes</p>
+                </div>
+              </div>
+              <Download size={16} className="text-slate-400 group-hover:text-emerald-600" />
+            </button>
+
+            <button 
+              onClick={() => exportAdvancesToExcel(advances)}
+              className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/30 rounded-xl transition-all group text-left active:scale-98"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="p-2.5 bg-white border border-slate-200 rounded-lg text-slate-500 group-hover:text-emerald-600 group-hover:border-emerald-200">
+                  <Landmark size={18} />
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-800 text-sm">Cash Advances Paid</h4>
+                  <p className="text-[10px] text-slate-400 font-mono">{advances.length} advance logs</p>
+                </div>
+              </div>
+              <Download size={16} className="text-slate-400 group-hover:text-emerald-600" />
+            </button>
+
+            <button 
+              onClick={() => exportFertilizersToExcel(fertilizers)}
+              className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/30 rounded-xl transition-all group text-left active:scale-98"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="p-2.5 bg-white border border-slate-200 rounded-lg text-slate-500 group-hover:text-emerald-600 group-hover:border-emerald-200">
+                  <Sprout size={18} />
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-800 text-sm">Fertilizer Issuances</h4>
+                  <p className="text-[10px] text-slate-400 font-mono">{fertilizers.length} handouts</p>
+                </div>
+              </div>
+              <Download size={16} className="text-slate-400 group-hover:text-emerald-600" />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

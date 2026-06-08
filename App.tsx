@@ -40,8 +40,8 @@ const MOCK_SESSION = {
 };
 
 const App: React.FC = () => {
-  const [session, setSession] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState<any>(MOCK_SESSION);
+  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'farmers' | 'collect' | 'history' | 'advances' | 'fertilizer' | 'settings' | 'reports' | 'inquiries'>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -61,23 +61,8 @@ const App: React.FC = () => {
       setDeferredPrompt(e);
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session || MOCK_SESSION);
-      setLoading(false);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session || MOCK_SESSION);
-    });
-
-    return () => subscription.unsubscribe();
+    fetchUserData();
   }, []);
-
-  useEffect(() => {
-    if (session?.user) {
-      fetchUserData();
-    }
-  }, [session]);
 
   const loadFromLocalStorage = () => {
     let savedSettings = localStorage.getItem('tealeaf_settings');
@@ -423,29 +408,23 @@ const App: React.FC = () => {
           </nav>
           
           <div className="mt-auto pt-4 border-t border-slate-100 space-y-2">
-            {session.user.id === '00000000-0000-0000-0000-000000000000' ? (
-              <button 
-                onClick={() => {
-                  if (window.confirm("This will clear all local modifications and reset the collection center to the default demo data. Proceed?")) {
-                    localStorage.removeItem('tealeaf_settings');
-                    localStorage.removeItem('tealeaf_farmers');
-                    localStorage.removeItem('tealeaf_collections');
-                    localStorage.removeItem('tealeaf_advances');
-                    localStorage.removeItem('tealeaf_fertilizers');
-                    localStorage.removeItem('tealeaf_inquiries');
-                    window.location.reload();
-                  }
-                }}
-                className="flex items-center space-x-3 w-full px-4 py-3 rounded-xl text-amber-600 hover:bg-amber-50 transition-colors"
-              >
-                <RefreshCw size={20} /> 
-                <span className="font-medium text-sm">Reset Demo Data</span>
-              </button>
-            ) : (
-              <button onClick={() => supabase.auth.signOut()} className="flex items-center space-x-3 w-full px-4 py-3 rounded-xl text-rose-600 hover:bg-rose-50 transition-colors">
-                <LogOut size={20} /> <span className="font-medium">Sign Out</span>
-              </button>
-            )}
+            <button 
+              onClick={() => {
+                if (window.confirm("This will clear all local modifications and reset the collection center to the default demo data. Proceed?")) {
+                  localStorage.removeItem('tealeaf_settings');
+                  localStorage.removeItem('tealeaf_farmers');
+                  localStorage.removeItem('tealeaf_collections');
+                  localStorage.removeItem('tealeaf_advances');
+                  localStorage.removeItem('tealeaf_fertilizers');
+                  localStorage.removeItem('tealeaf_inquiries');
+                  window.location.reload();
+                }
+              }}
+              className="flex items-center space-x-3 w-full px-4 py-3 rounded-xl text-amber-600 hover:bg-amber-50 transition-colors"
+            >
+              <RefreshCw size={20} /> 
+              <span className="font-medium text-sm text-[15px]">Reset Demo Data</span>
+            </button>
           </div>
         </div>
       </aside>

@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { CollectionRecord, TeaGrade } from '../types';
 import { Download, Filter, FileText, Printer, Search, Calendar } from 'lucide-react';
+import { exportCollectionsToExcel } from '../lib/exportUtils';
 
 interface Props {
   collections: CollectionRecord[];
@@ -51,9 +52,13 @@ const HistoryView: React.FC<Props> = ({ collections }) => {
               onChange={e => setFilterTerm(e.target.value)}
             />
           </div>
-          <button onClick={handlePrint} className="flex items-center space-x-2 bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-emerald-700 shadow-lg active:scale-95 transition-all">
+          <button onClick={() => exportCollectionsToExcel(filteredCollections)} className="flex items-center space-x-2 bg-white border-2 border-emerald-600 text-emerald-700 px-4 py-3 rounded-xl font-bold hover:bg-emerald-50 active:scale-95 transition-all" title="Export current search results to Microsoft Excel">
+            <Download size={20} className="text-emerald-600" />
+            <span className="hidden md:inline text-xs lg:text-sm">Excel Export</span>
+          </button>
+          <button onClick={handlePrint} className="flex items-center space-x-2 bg-emerald-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-emerald-700 shadow-lg active:scale-95 transition-all">
             <Printer size={20} />
-            <span className="hidden md:inline">Print Report</span>
+            <span className="hidden md:inline text-xs lg:text-sm">Print Report</span>
           </button>
         </div>
       </div>
